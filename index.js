@@ -5,7 +5,7 @@ const cors = require('cors');
 const MongoClient = require('mongodb').MongoClient;
 const ObjectID  = require('mongodb').ObjectID;
 const app = express();
-const port = process.env.PORT || 5055;
+const port = process.env.PORT || 5056;
 app.use(bodyParser.json());
 app.use(cors());
 
@@ -20,25 +20,44 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 client.connect(err => {
     console.log('connection err', err)
     const eventCollection = client.db("fresh-valley").collection("products");
+    const ordersCollection = client.db("fresh-valley").collection("orders");
     console.log('database connection');
     // console.log(eventCollection)
   
-    // app.get('/events', (req, res) => {
-    //     eventCollection.find()
-    //     .toArray((err, items) => {
-    //         res.send(items);
-    //     })
-    // })
+    app.get('/events', (req, res) => {
+        eventCollection.find()
+        .toArray((err, items) => {
+            res.send(items);
+        })
+    })
 
-//   app.post('/addEvent', (req, res) => {
-//       const newEvent = req.body;
-//       console.log('adding new event: ', newEvent)
-//       eventCollection.insertOne(newEvent)
-//       .then(result => {
-//           console.log('inserted count', result.insertedCount);
-//           res.send(result.insertedCount > 0)
-//       })
-//   })
+    app.get('/orders', (req, res) => {
+        ordersCollection.find()
+        .toArray((err, items) => {
+            res.send(items);
+        })
+    })
+
+    app.post('/addOrder', (req, res) => {
+        const order = req.body;
+        ordersCollection.insertOne(order)
+        .then(result => {
+          //   console.log(result);
+            res.send(result.insertedCount > 0)
+    
+        })
+    
+    })
+
+  app.post('/addEvent', (req, res) => {
+      const newEvent = req.body;
+      console.log('adding new event: ', newEvent)
+      eventCollection.insertOne(newEvent)
+      .then(result => {
+          console.log('inserted count', result.insertedCount);
+          res.send(result.insertedCount > 0)
+      })
+  })
 
 //   app.delete('deleteEvent/:id', (req, res) => {
 //       const id = ObjectID(req.params.id);
